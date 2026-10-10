@@ -13,11 +13,20 @@ public class Facility {
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
+    @Column(nullable = false)
+    private Boolean active = true;
+
     public Facility() {
     }
 
     public Facility(String name) {
         this.name = name;
+        this.active = true;
+    }
+
+    public Facility(String name, Boolean active) {
+        this.name = name;
+        this.active = active;
     }
 
     public Integer getId() {
@@ -34,6 +43,14 @@ public class Facility {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     @Override

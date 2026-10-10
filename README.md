@@ -121,10 +121,44 @@ Content-Type: application/json
 - **Professor:** `aturing@classsync.edu` / `password123`
 - **Professor:** `alovelace@classsync.edu` / `password123`
 
+## Domain APIs (Prompt 5: Complex, Room, and Facility)
+
+Authenticated users (Professors and Admins) can read active resources. Only Admins can create, update, or activate/deactivate resources. Physical deletion is not permitted; status deactivation (`active = false`) is used instead.
+
+### Complex APIs
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/complexes` | Authenticated | List all active complexes |
+| `GET` | `/api/complexes/{id}` | Authenticated | Get active complex by ID |
+| `POST` | `/api/complexes` | `ROLE_ADMIN` | Create a new complex (unique code) |
+| `PUT` | `/api/complexes/{id}` | `ROLE_ADMIN` | Update complex name/code |
+| `PATCH` | `/api/complexes/{id}/status` | `ROLE_ADMIN` | Activate or deactivate a complex |
+
+### Room APIs
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/complexes/{complexId}/rooms` | Authenticated | List active rooms for an active complex |
+| `POST` | `/api/complexes/{complexId}/rooms` | `ROLE_ADMIN` | Create room inside a complex (unique within complex) |
+| `GET` | `/api/rooms/{id}` | Authenticated | Get active room by ID with complex & facilities |
+| `PUT` | `/api/rooms/{id}` | `ROLE_ADMIN` | Update room number, type, capacity, and facilities |
+| `PATCH` | `/api/rooms/{id}/status` | `ROLE_ADMIN` | Activate or deactivate a room |
+
+### Facility APIs
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/facilities` | Authenticated | List all active facilities |
+| `POST` | `/api/facilities` | `ROLE_ADMIN` | Create a new facility (unique name) |
+| `PUT` | `/api/facilities/{id}` | `ROLE_ADMIN` | Update facility name |
+| `PATCH` | `/api/facilities/{id}/status` | `ROLE_ADMIN` | Activate or deactivate a facility |
+
 ## Testing
 
-Run all unit, repository, and security integration tests:
+Run all unit, repository, security, and domain integration tests (33 tests):
 ```bash
 mvn test
 ```
+
 
