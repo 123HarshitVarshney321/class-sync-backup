@@ -1,16 +1,23 @@
 package com.classsync.controller;
 
 import com.classsync.dto.common.StatusUpdateRequest;
+import com.classsync.dto.room.AvailableRoomResponse;
 import com.classsync.dto.room.CreateRoomRequest;
 import com.classsync.dto.room.RoomDetailResponse;
 import com.classsync.dto.room.RoomSummaryResponse;
 import com.classsync.dto.room.UpdateRoomRequest;
+import com.classsync.entity.RoomType;
+import com.classsync.service.AvailabilityService;
 import com.classsync.service.RoomService;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -18,9 +25,27 @@ import java.util.List;
 public class RoomController {
 
     private final RoomService roomService;
+    private final AvailabilityService availabilityService;
 
-    public RoomController(RoomService roomService) {
+    public RoomController(RoomService roomService, AvailabilityService availabilityService) {
         this.roomService = roomService;
+        this.availabilityService = availabilityService;
+    }
+
+    @GetMapping("/rooms/available")
+    public ResponseEntity<List<AvailableRoomResponse>> getAvailableRooms(
+            @RequestParam(required = false) Integer complexId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime,
+            @RequestParam(required = false) Integer capacity,
+            @RequestParam(required = false) RoomType roomType,
+            @RequestParam(required = false) String facilities,
+            Principal principal) {
+        List<AvailableRoomResponse> response = availabilityService.getAvailableRooms(
+                complexId, date, startTime, endTime, capacity, roomType, facilities, principal.getName()
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/complexes/{complexId}/rooms")

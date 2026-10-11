@@ -27,4 +27,23 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
 
     @Query("SELECT r FROM Room r JOIN FETCH r.complex LEFT JOIN FETCH r.facilities WHERE r.id = :id")
     Optional<Room> findByIdWithDetails(@Param("id") Integer id);
+
+    @Query("""
+        SELECT DISTINCT r FROM Room r
+        JOIN FETCH r.complex c
+        LEFT JOIN FETCH r.facilities f
+        WHERE r.active = true
+          AND c.active = true
+          AND (:complexId IS NULL OR c.id = :complexId)
+          AND (:capacity IS NULL OR r.capacity >= :capacity)
+          AND (:roomType IS NULL OR r.roomType = :roomType)
+          AND r.id NOT IN :busyRoomIds
+        ORDER BY c.name ASC, r.roomNumber ASC, r.id ASC
+    """)
+    List<Room> findAvailableRooms(
+            @Param("complexId") Integer complexId,
+            @Param("capacity") Integer capacity,
+            @Param("roomType") com.classsync.entity.RoomType roomType,
+            @Param("busyRoomIds") java.util.Collection<Integer> busyRoomIds
+    );
 }
