@@ -147,4 +147,33 @@ public interface ScheduleOccurrenceRepository extends JpaRepository<ScheduleOccu
             @Param("endTime") java.time.LocalTime endTime,
             @Param("excludedOccurrenceId") Integer excludedOccurrenceId
     );
+
+    @Query("""
+        SELECT o.room.id, COUNT(o)
+        FROM ScheduleOccurrence o
+        WHERE o.room.id IN :roomIds
+          AND o.scheduleDate BETWEEN :startDate AND :endDate
+          AND o.status = com.classsync.entity.ScheduleStatus.SCHEDULED
+        GROUP BY o.room.id
+    """)
+    List<Object[]> countScheduledOccurrencesForRooms(
+            @Param("roomIds") Collection<Integer> roomIds,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query("""
+        SELECT DISTINCT o.room.id
+        FROM ScheduleOccurrence o
+        WHERE o.professor.id = :professorId
+          AND o.scheduleDate = :date
+          AND o.status = com.classsync.entity.ScheduleStatus.SCHEDULED
+          AND (o.endTime = :startTime OR o.startTime = :endTime)
+    """)
+    List<Integer> findAdjacentRoomIdsForProfessor(
+            @Param("professorId") Integer professorId,
+            @Param("date") LocalDate date,
+            @Param("startTime") java.time.LocalTime startTime,
+            @Param("endTime") java.time.LocalTime endTime
+    );
 }

@@ -49,6 +49,22 @@ public class AvailabilityService {
             RoomType roomType,
             String facilitiesParam,
             String userEmail) {
+        return getAvailableRoomEntities(complexId, date, startTime, endTime, capacity, roomType, facilitiesParam, userEmail)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Room> getAvailableRoomEntities(
+            Integer complexId,
+            LocalDate date,
+            LocalTime startTime,
+            LocalTime endTime,
+            Integer capacity,
+            RoomType roomType,
+            String facilitiesParam,
+            String userEmail) {
 
         if (date == null) {
             throw new BadRequestException("Date is required");
@@ -97,12 +113,10 @@ public class AvailabilityService {
                     .toList();
         }
 
-        return candidateRooms.stream()
-                .map(this::toResponse)
-                .toList();
+        return candidateRooms;
     }
 
-    private Set<Integer> parseAndValidateFacilityIds(String facilitiesParam) {
+    public Set<Integer> parseAndValidateFacilityIds(String facilitiesParam) {
         if (facilitiesParam == null || facilitiesParam.isBlank()) {
             return Collections.emptySet();
         }
