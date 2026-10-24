@@ -107,4 +107,44 @@ public interface ScheduleOccurrenceRepository extends JpaRepository<ScheduleOccu
             @Param("startTime") java.time.LocalTime startTime,
             @Param("endTime") java.time.LocalTime endTime
     );
+
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT o FROM ScheduleOccurrence o WHERE o.id = :id")
+    Optional<ScheduleOccurrence> findByIdWithLock(@Param("id") Integer id);
+
+    @Query("""
+        SELECT COUNT(o) > 0
+        FROM ScheduleOccurrence o
+        WHERE o.room.id = :roomId
+          AND o.scheduleDate = :date
+          AND o.status = com.classsync.entity.ScheduleStatus.SCHEDULED
+          AND o.startTime < :endTime
+          AND o.endTime > :startTime
+          AND (:excludedOccurrenceId IS NULL OR o.id != :excludedOccurrenceId)
+    """)
+    boolean existsRoomConflictExcludingId(
+            @Param("roomId") Integer roomId,
+            @Param("date") LocalDate date,
+            @Param("startTime") java.time.LocalTime startTime,
+            @Param("endTime") java.time.LocalTime endTime,
+            @Param("excludedOccurrenceId") Integer excludedOccurrenceId
+    );
+
+    @Query("""
+        SELECT COUNT(o) > 0
+        FROM ScheduleOccurrence o
+        WHERE o.professor.id = :professorId
+          AND o.scheduleDate = :date
+          AND o.status = com.classsync.entity.ScheduleStatus.SCHEDULED
+          AND o.startTime < :endTime
+          AND o.endTime > :startTime
+          AND (:excludedOccurrenceId IS NULL OR o.id != :excludedOccurrenceId)
+    """)
+    boolean existsProfessorConflictExcludingId(
+            @Param("professorId") Integer professorId,
+            @Param("date") LocalDate date,
+            @Param("startTime") java.time.LocalTime startTime,
+            @Param("endTime") java.time.LocalTime endTime,
+            @Param("excludedOccurrenceId") Integer excludedOccurrenceId
+    );
 }

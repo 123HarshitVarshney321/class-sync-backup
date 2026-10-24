@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/complexes/**", "/api/rooms/**", "/api/facilities/**", "/api/timetables/**", "/api/schedule-occurrences/**").hasAnyRole("PROFESSOR", "ADMIN")
                         .requestMatchers("/api/complexes/**", "/api/rooms/**", "/api/facilities/**", "/api/timetables/**", "/api/schedule-occurrences/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/bookings").hasRole("PROFESSOR")
+                        .requestMatchers(HttpMethod.POST, "/api/classes/**").hasAnyRole("PROFESSOR", "ADMIN")
                         .anyRequest().authenticated()
                 );
 
