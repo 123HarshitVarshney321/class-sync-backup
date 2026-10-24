@@ -91,4 +91,20 @@ public interface ScheduleOccurrenceRepository extends JpaRepository<ScheduleOccu
             @Param("startTime") java.time.LocalTime startTime,
             @Param("endTime") java.time.LocalTime endTime
     );
+
+    @Query("""
+        SELECT COUNT(o) > 0
+        FROM ScheduleOccurrence o
+        WHERE o.room.id = :roomId
+          AND o.scheduleDate = :date
+          AND o.status = com.classsync.entity.ScheduleStatus.SCHEDULED
+          AND o.startTime < :endTime
+          AND o.endTime > :startTime
+    """)
+    boolean existsRoomConflict(
+            @Param("roomId") Integer roomId,
+            @Param("date") LocalDate date,
+            @Param("startTime") java.time.LocalTime startTime,
+            @Param("endTime") java.time.LocalTime endTime
+    );
 }

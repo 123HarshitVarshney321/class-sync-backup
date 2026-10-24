@@ -46,4 +46,8 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
             @Param("roomType") com.classsync.entity.RoomType roomType,
             @Param("busyRoomIds") java.util.Collection<Integer> busyRoomIds
     );
+
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT r FROM Room r WHERE r.id = :id")
+    Optional<Room> findByIdWithLock(@Param("id") Integer id);
 }
